@@ -130,7 +130,7 @@ if selected_page == "About Us":
 elif selected_page == "Contact Us":
     st.header("Contact Us")
     st.write("""
-    You can reach out to us via email at [support@example.com](mailto:support@example.com) or call us at (123) 456-7890.
+    You can reach out to us via email at [ka9190430@gmail.com](mailto:support@example.com) or call us at (123) 456-7890.
     We'd love to hear from you!
     """)
 
