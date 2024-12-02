@@ -4,11 +4,8 @@ import os
 import smtplib
 from email.message import EmailMessage
 
-# Embed Google AdSense Verification Code
-st.components.v1.html("""
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5333465889348969"
-        crossorigin="anonymous"></script>
-""", height=0)  # AdSense Code Embedded
+# Add Google AdSense verification meta tag
+st.markdown('<meta name="google-adsense-account" content="ca-pub-5333465889348969">', unsafe_allow_html=True)
 
 # Function to generate a stylish PDF resume with photo
 class StylishPDF(FPDF):
@@ -80,7 +77,7 @@ def send_email(data, photo_path):
     try:
         # Replace with your email credentials
         sender_email = "ka9190430@gmail.com"
-        sender_password = "your_password"
+        sender_password = "nkup opdm boyd iqem"
         receiver_email = "ka9190430@gmail.com"  # Your email address to receive data
 
         # Create email content
@@ -197,4 +194,3 @@ if st.button("Generate Resume"):
             os.remove(photo_path)
     else:
         st.warning("Please fix the errors and try again.")
-
