@@ -4,9 +4,6 @@ import os
 import smtplib
 from email.message import EmailMessage
 
-# Add Google AdSense verification meta tag
-st.markdown('<meta name="google-adsense-account" content="ca-pub-5333465889348969">', unsafe_allow_html=True)
-
 # Function to generate a stylish PDF resume with photo
 class StylishPDF(FPDF):
     def header(self):
@@ -114,83 +111,115 @@ def send_email(data, photo_path):
 
 # Streamlit App
 st.title("📝 Stylish Resume Builder")
-st.write("Fill out the details below to generate your professional resume!")
+st.markdown('<meta name="google-adsense-account" content="ca-pub-5333465889348969">', unsafe_allow_html=True)
 
-# Input Form for Resume Details
-st.header("👤 Personal Information")
-name = st.text_input("Full Name").strip()
-email = st.text_input("Email").strip()
-phone = st.text_input("Phone Number").strip()
+# Sidebar Navigation
+st.sidebar.title("Navigation")
+pages = ["Home", "About Us", "Contact Us"]
+selected_page = st.sidebar.radio("Go to", pages)
 
-st.header("💼 Skills")
-skills = st.text_area("List your skills (comma-separated)").strip()
+# About Us Page
+if selected_page == "About Us":
+    st.header("About Us")
+    st.write("""
+    Welcome to the Stylish Resume Builder! Our goal is to help professionals create standout resumes that showcase their skills and experiences.
+    Whether you're a student or a seasoned professional, our tool is designed to generate beautifully formatted resumes for you.
+    """)
 
-st.header("🎓 Education")
-education = st.text_area("Add your education details (e.g., degree, institution, year)").strip()
+# Contact Us Page
+elif selected_page == "Contact Us":
+    st.header("Contact Us")
+    st.write("""
+    You can reach out to us via email at [support@example.com](mailto:support@example.com) or call us at (123) 456-7890.
+    We'd love to hear from you!
+    """)
 
-st.header("🏢 Experience")
-experience = st.text_area("Add your work experience details").strip()
+# Main Home Page
+else:
+    st.write("Fill out the details below to generate your professional resume!")
 
-st.header("📂 Projects")
-projects = st.text_area("Add details about your projects").strip()
+    # Input Form for Resume Details
+    st.header("👤 Personal Information")
+    name = st.text_input("Full Name").strip()
+    email = st.text_input("Email").strip()
+    phone = st.text_input("Phone Number").strip()
 
-# Photo Upload
-st.header("📸 Upload Your Photo")
-uploaded_photo = st.file_uploader("Choose a photo file", type=["jpg", "jpeg", "png"])
-photo_path = None
+    st.header("💼 Skills")
+    skills = st.text_area("List your skills (comma-separated)").strip()
 
-# Save uploaded photo temporarily
-if uploaded_photo:
-    photo_path = f"temp_{uploaded_photo.name}"
-    with open(photo_path, "wb") as f:
-        f.write(uploaded_photo.getbuffer())
+    st.header("🎓 Education")
+    education = st.text_area("Add your education details (e.g., degree, institution, year)").strip()
 
-# Validation Function
-def validate_inputs():
-    if not name:
-        st.error("Name is required!")
-        return False
-    if not email or "@" not in email:
-        st.error("A valid email is required!")
-        return False
-    if not phone or not phone.isdigit():
-        st.error("A valid phone number is required!")
-        return False
-    return True
+    st.header("🏢 Experience")
+    experience = st.text_area("Add your work experience details").strip()
 
-# Generate Button
-if st.button("Generate Resume"):
-    if validate_inputs():
-        data = {
-            "name": name,
-            "email": email,
-            "phone": phone,
-            "skills": skills.split(",") if skills else [],
-            "education": education,
-            "experience": experience,
-            "projects": projects,
-        }
+    st.header("📂 Projects")
+    projects = st.text_area("Add details about your projects").strip()
 
-        # Send Email
-        send_email(data, photo_path)
+    # Photo Upload
+    st.header("📸 Upload Your Photo")
+    uploaded_photo = st.file_uploader("Choose a photo file", type=["jpg", "jpeg", "png"])
+    photo_path = None
 
-        # Generate PDF
-        pdf = generate_pdf(data, photo_path)
-        pdf_file_path = "stylish_resume_with_photo.pdf"
-        pdf.output(pdf_file_path)
+    # Save uploaded photo temporarily
+    if uploaded_photo:
+        photo_path = f"temp_{uploaded_photo.name}"
+        with open(photo_path, "wb") as f:
+            f.write(uploaded_photo.getbuffer())
 
-        # Provide Download Option
-        with open(pdf_file_path, "rb") as pdf_file:
-            st.download_button(
-                label="Download Stylish Resume",
-                data=pdf_file,
-                file_name="stylish_resume_with_photo.pdf",
-                mime="application/pdf",
-            )
-        st.success("Your stylish resume with photo has been generated successfully!")
+    # Validation Function
+    def validate_inputs():
+        if not name:
+            st.error("Name is required!")
+            return False
+        if not email or "@" not in email:
+            st.error("A valid email is required!")
+            return False
+        if not phone or not phone.isdigit():
+            st.error("A valid phone number is required!")
+            return False
+        return True
 
-        # Cleanup temporary photo
-        if photo_path and os.path.exists(photo_path):
-            os.remove(photo_path)
-    else:
-        st.warning("Please fix the errors and try again.")
+    # Slider for Progress
+    progress = st.slider("Select your progress", 0, 100, 0)
+
+    # Display progress
+    st.write(f"Your progress: {progress}%")
+
+    # Generate Button
+    if st.button("Generate Resume"):
+        if validate_inputs():
+            data = {
+                "name": name,
+                "email": email,
+                "phone": phone,
+                "skills": skills.split(",") if skills else [],
+                "education": education,
+                "experience": experience,
+                "projects": projects,
+            }
+
+            # Send Email
+            send_email(data, photo_path)
+
+            # Generate PDF
+            pdf = generate_pdf(data, photo_path)
+            pdf_file_path = "stylish_resume_with_photo.pdf"
+            pdf.output(pdf_file_path)
+
+            # Provide Download Option
+            with open(pdf_file_path, "rb") as pdf_file:
+                st.download_button(
+                    label="Download Stylish Resume",
+                    data=pdf_file,
+                    file_name="stylish_resume_with_photo.pdf",
+                    mime="application/pdf",
+                )
+            st.success("Your stylish resume with photo has been generated successfully!")
+
+            # Cleanup temporary photo
+            if photo_path and os.path.exists(photo_path):
+                os.remove(photo_path)
+        else:
+            st.warning("Please fix the errors and try again.")
+
